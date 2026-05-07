@@ -39,9 +39,14 @@ class _StarRatingWidgetState extends State<StarRatingWidget>
 
   double get _widgetHeight => widget.width / _widthToHeightRatio;
 
-  double get _starSize => _widgetHeight * 0.74;
-
   double get _horizontalPadding => _widgetHeight * 0.28;
+
+  double get _starSize {
+    final availableWidth = widget.width - (_horizontalPadding * 2);
+    final slotWidth = availableWidth / widget.totalStars;
+    final desiredSize = _widgetHeight * 0.76;
+    return desiredSize.clamp(0.0, slotWidth * 0.94);
+  }
 
   @override
   void initState() {

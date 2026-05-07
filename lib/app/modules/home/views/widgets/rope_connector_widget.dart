@@ -10,16 +10,18 @@ class RopeConnectorWidget extends StatelessWidget {
     required this.controlOne,
     required this.controlTwo,
     required this.end,
+    this.bendStart,
+    this.bendEnd,
+    this.mid,
+    this.controlThree,
+    this.controlFour,
     this.shadowWidth = 6,
     this.strokeWidth = 4.5,
     this.shadowColor = const Color(0x332742A7),
     this.gradient = const LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
-      colors: [
-        Color(0xFF4E42D8),
-        Color(0xFF4A2CC8),
-      ],
+      colors: [Color(0xFF4E42D8), Color(0xFF4A2CC8)],
     ),
   });
 
@@ -30,6 +32,11 @@ class RopeConnectorWidget extends StatelessWidget {
   final Offset controlOne;
   final Offset controlTwo;
   final Offset end;
+  final Offset? bendStart;
+  final Offset? bendEnd;
+  final Offset? mid;
+  final Offset? controlThree;
+  final Offset? controlFour;
   final double shadowWidth;
   final double strokeWidth;
   final Color shadowColor;
@@ -48,6 +55,11 @@ class RopeConnectorWidget extends StatelessWidget {
             controlOne: controlOne,
             controlTwo: controlTwo,
             end: end,
+            bendStart: bendStart,
+            bendEnd: bendEnd,
+            mid: mid,
+            controlThree: controlThree,
+            controlFour: controlFour,
             shadowWidth: shadowWidth,
             strokeWidth: strokeWidth,
             shadowColor: shadowColor,
@@ -66,6 +78,11 @@ class _RopeConnectorPainter extends CustomPainter {
     required this.controlOne,
     required this.controlTwo,
     required this.end,
+    required this.bendStart,
+    required this.bendEnd,
+    required this.mid,
+    required this.controlThree,
+    required this.controlFour,
     required this.shadowWidth,
     required this.strokeWidth,
     required this.shadowColor,
@@ -77,6 +94,11 @@ class _RopeConnectorPainter extends CustomPainter {
   final Offset controlOne;
   final Offset controlTwo;
   final Offset end;
+  final Offset? bendStart;
+  final Offset? bendEnd;
+  final Offset? mid;
+  final Offset? controlThree;
+  final Offset? controlFour;
   final double shadowWidth;
   final double strokeWidth;
   final Color shadowColor;
@@ -84,9 +106,50 @@ class _RopeConnectorPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final basePath = Path()
-      ..moveTo(start.dx, start.dy)
-      ..cubicTo(
+    final basePath = Path()..moveTo(start.dx, start.dy);
+
+    if (bendStart != null && bendEnd != null) {
+      final horizontalSpan = end.dx - bendStart!.dx;
+      final rise = bendStart!.dy - end.dy;
+      final controlOne = Offset(
+        bendStart!.dx + (horizontalSpan * 0.90),
+        bendStart!.dy,
+      );
+      final controlTwo = Offset(
+        end.dx - (horizontalSpan * 0.010),
+        end.dy + (rise * 0.90),
+      );
+
+      basePath
+        ..lineTo(bendStart!.dx, bendStart!.dy)
+        ..cubicTo(
+          controlOne.dx,
+          controlOne.dy,
+          controlTwo.dx,
+          controlTwo.dy,
+          end.dx,
+          end.dy,
+        );
+    } else if (mid != null && controlThree != null && controlFour != null) {
+      basePath
+        ..cubicTo(
+          controlOne.dx,
+          controlOne.dy,
+          controlTwo.dx,
+          controlTwo.dy,
+          mid!.dx,
+          mid!.dy,
+        )
+        ..cubicTo(
+          controlThree!.dx,
+          controlThree!.dy,
+          controlFour!.dx,
+          controlFour!.dy,
+          end.dx,
+          end.dy,
+        );
+    } else {
+      basePath.cubicTo(
         controlOne.dx,
         controlOne.dy,
         controlTwo.dx,
@@ -94,6 +157,7 @@ class _RopeConnectorPainter extends CustomPainter {
         end.dx,
         end.dy,
       );
+    }
 
     final visiblePath = Path();
     for (final metric in basePath.computeMetrics()) {
@@ -127,6 +191,11 @@ class _RopeConnectorPainter extends CustomPainter {
         oldDelegate.start != start ||
         oldDelegate.controlOne != controlOne ||
         oldDelegate.controlTwo != controlTwo ||
+        oldDelegate.bendStart != bendStart ||
+        oldDelegate.bendEnd != bendEnd ||
+        oldDelegate.mid != mid ||
+        oldDelegate.controlThree != controlThree ||
+        oldDelegate.controlFour != controlFour ||
         oldDelegate.end != end ||
         oldDelegate.shadowWidth != shadowWidth ||
         oldDelegate.strokeWidth != strokeWidth ||

@@ -47,19 +47,21 @@ class _HandWidgetState extends State<HandWidget>
         animation: _handCtrl,
         builder: (context, child) {
           final press = _pressCurve(_handCtrl.value);
-          final offsetY = 3.2 * press;
-          final offsetX = -2.0 + (-1.2 * press);
-          final angle = -0.02 + (math.sin(press * math.pi) * 0.022);
-          final scale = 1.01 - (0.015 * press);
+          final swing = math.sin(press * math.pi);
+          final offsetY = 0.8 * press;
+          final offsetX = -0.6 * press;
+          final angle = (-0.05 * press) + (swing * 0.018);
+          final scale = 1.0 - (0.008 * press);
+          const pivot = Alignment(-0.86, 0.18);
 
           return Transform.translate(
             offset: Offset(offsetX, offsetY),
             child: Transform.rotate(
               angle: angle,
-              alignment: const Alignment(0.72, 0.28),
+              alignment: pivot,
               child: Transform.scale(
                 scale: scale,
-                alignment: const Alignment(0.72, 0.28),
+                alignment: pivot,
                 child: child,
               ),
             ),
