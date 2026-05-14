@@ -64,6 +64,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/icons/cat_parts/
+    - assets/icons/hijab_girl_parts/
     - assets/background/
     - assets/studyo_collection/mylogoanimation/
 

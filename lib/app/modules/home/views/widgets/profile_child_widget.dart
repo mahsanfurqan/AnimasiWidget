@@ -35,7 +35,7 @@ class _ProfileChildWidgetState extends State<ProfileChildWidget>
     _ambientCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3400),
-    )..repeat(reverse: true);
+    )..repeat();
   }
 
   @override
@@ -54,7 +54,7 @@ class _ProfileChildWidgetState extends State<ProfileChildWidget>
         builder: (context, _) {
           final pulseT = (math.sin(_ambientCtrl.value * math.pi * 2) + 1) / 2;
           final streamT = _ambientCtrl.value;
-          final progressT = Curves.easeInOutSine.transform(streamT);
+          final streamTravelT = Curves.easeInOutSine.transform(streamT);
           final cardGlow =
               Color.lerp(
                 const Color(0x26F7D3A2),
@@ -76,12 +76,18 @@ class _ProfileChildWidgetState extends State<ProfileChildWidget>
                 pulseT,
               ) ??
               const Color(0xFFE3B3A2);
-          final streamWidthFactor = progressT.clamp(0.0, 1.0);
-          final streamHighlightWidthFactor = math.min(0.28, streamWidthFactor);
+          final streamPacketWidthFactor = 0.42;
+          final streamPacketLeft =
+              (1 - streamPacketWidthFactor) * streamTravelT;
+          final streamHighlightWidthFactor = 0.18;
           final streamHighlightLeft =
-              streamWidthFactor <= streamHighlightWidthFactor
-              ? 0.0
-              : (streamWidthFactor - streamHighlightWidthFactor) * streamT;
+              streamPacketLeft +
+              ((streamPacketWidthFactor - streamHighlightWidthFactor) * 0.52);
+          final streamEchoWidthFactor = 0.18;
+          final streamEchoTravelT = Curves.easeInOutSine.transform(
+            (streamT + 0.28) % 1.0,
+          );
+          final streamEchoLeft = (1 - streamEchoWidthFactor) * streamEchoTravelT;
 
           return Stack(
             clipBehavior: Clip.none,
@@ -137,8 +143,8 @@ class _ProfileChildWidgetState extends State<ProfileChildWidget>
                         child: Column(
                           children: [
                             Container(
-                              width: _cardWidth * 0.43,
-                              height: _cardWidth * 0.43,
+                              width: _cardWidth * 0.50,
+                              height: _cardWidth * 0.50,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -154,7 +160,7 @@ class _ProfileChildWidgetState extends State<ProfileChildWidget>
                               ),
                               child: ClipOval(
                                 child: Padding(
-                                  padding: EdgeInsets.all(_cardWidth * 0.006),
+                                  padding: EdgeInsets.all(_cardWidth * 0.004),
                                   child: SvgPicture.asset(
                                     ProfileChildWidget._profileAsset,
                                     fit: BoxFit.cover,
@@ -228,54 +234,92 @@ class _ProfileChildWidgetState extends State<ProfileChildWidget>
                     child: Stack(
                       children: [
                         Container(color: const Color(0xFFE7DEF2)),
-                        FractionallySizedBox(
-                          widthFactor: streamWidthFactor,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [loadingStart, loadingEnd],
-                              ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                loadingStart.withValues(alpha: 0.18),
+                                loadingEnd.withValues(alpha: 0.18),
+                              ],
                             ),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: FractionallySizedBox(
-                            widthFactor: streamWidthFactor,
-                            child: LayoutBuilder(
-                              builder: (context, constraints) {
-                                return Stack(
-                                  children: [
-                                    Positioned(
-                                      left:
-                                          constraints.maxWidth *
-                                          streamHighlightLeft,
-                                      top: 0,
-                                      bottom: 0,
-                                      child: Container(
-                                        width:
-                                            constraints.maxWidth *
-                                            streamHighlightWidthFactor,
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                            colors: [
-                                              Color(0x00FFFFFF),
-                                              Color(0x88FFF7E5),
-                                              Color(0x00FFFFFF),
-                                            ],
-                                          ),
-                                        ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final packetWidth =
+                                constraints.maxWidth * streamPacketWidthFactor;
+                            final highlightWidth =
+                                constraints.maxWidth *
+                                streamHighlightWidthFactor;
+                            final echoWidth =
+                                constraints.maxWidth * streamEchoWidthFactor;
+
+                            return Stack(
+                              children: [
+                                Positioned(
+                                  left: constraints.maxWidth * streamPacketLeft,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: packetWidth,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          loadingStart.withValues(alpha: 0.00),
+                                          loadingStart.withValues(alpha: 0.72),
+                                          loadingEnd.withValues(alpha: 0.92),
+                                          loadingEnd.withValues(alpha: 0.00),
+                                        ],
+                                        stops: const [0.0, 0.24, 0.78, 1.0],
                                       ),
                                     ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: constraints.maxWidth * streamHighlightLeft,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: highlightWidth,
+                                    decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          Color(0x00FFFFFF),
+                                          Color(0x99FFF7E5),
+                                          Color(0x00FFFFFF),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: constraints.maxWidth * streamEchoLeft,
+                                  top: constraints.maxHeight * 0.10,
+                                  bottom: constraints.maxHeight * 0.10,
+                                  child: Container(
+                                    width: echoWidth,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          loadingStart.withValues(alpha: 0.00),
+                                          loadingStart.withValues(alpha: 0.28),
+                                          loadingEnd.withValues(alpha: 0.00),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ],
                     ),

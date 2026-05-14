@@ -43,7 +43,7 @@ class _AddNewChildWidgetState extends State<AddNewChildWidget>
   static const double _leafLeftFactor = 0.066;
   static const double _leafBottomFactor = 0.350;
   static const double _profileCardWidthFactor = 0.140;
-  static const double _profileCardCenterXFactor = 0.670;
+  static const double _profileCardCenterXFactor = 0.660;
   static const double _profileCardTopFactor = 0.105;
   static const double _sofaRightWidthFactor = 0.230;
   static const double _sofaRightRightFactor = 0.615;
@@ -174,7 +174,7 @@ class _AddNewChildWidgetState extends State<AddNewChildWidget>
         ? 0.150
         : _profileCardWidthFactor;
     final profileCardCenterXFactor = isLandscape
-        ? 0.680
+        ? 0.670
         : _profileCardCenterXFactor;
     final profileCardTopFactor = isLandscape ? 0.095 : _profileCardTopFactor;
     final profileCardWidth = (width * profileCardWidthFactor).roundToDouble();

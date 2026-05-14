@@ -6,6 +6,7 @@ import '../controllers/home_controller.dart';
 import 'widgets/add_new_child_widget.dart';
 import 'widgets/create_parent_account_widget.dart';
 import 'widgets/link_account_widget.dart';
+import 'widgets/onboarding_expandable_widget.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -40,6 +41,8 @@ class HomeView extends GetView<HomeController> {
                     AddNewChildWidget(width: panelWidth),
                     const SizedBox(height: 16),
                     LinkAccountWidget(width: panelWidth),
+                    const SizedBox(height: 16),
+                    OnboardingExpandableWidget(width: panelWidth),
                   ],
                 ),
               ),
