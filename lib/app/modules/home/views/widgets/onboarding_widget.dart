@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'handphone2_widget.dart';
+import 'floating_four_widget.dart';
 import 'hijab_girl_widget.dart';
-import 'leaf3_widget.dart';
+import 'pot_leaf_widget.dart';
 import 'sparkle4_widget.dart';
 
 class OnboardingWidget extends StatefulWidget {
@@ -12,19 +13,19 @@ class OnboardingWidget extends StatefulWidget {
   final double width;
 
   static const String _backgroundAsset =
-      'assets/background/background_onboarding.png';
-  static const double _backgroundAspectRatio = 1721 / 2304;
+      'assets/background/background_onboarding.svg';
+  static const double _backgroundAspectRatio = 8483 / 11367;
   static const Alignment _backgroundAlignment = Alignment(0.12, 0.0);
   static const double _hijabGirlWidthFactor = 0.25;
   static const double _hijabGirlLeftFactor = 0.08;
   static const double _hijabGirlTopFactor = 0.35;
   static const double _handphone2WidthFactor = 0.29;
   static const double _handphone2LeftFactor = 0.59;
-  static const double _handphone2TopFactor = 0.12;
-  static const double _leaf3AspectRatio = 212 / 289;
-  static const double _leaf3WidthFactor = 0.06;
-  static const double _leaf3LeftFactor = 0.115;
-  static const double _leaf3TopFactor = 0.786;
+  static const double _handphone2TopFactor = 0.09;
+  static const double _leaf3AspectRatio = 1330 / 1670;
+  static const double _leaf3WidthFactor = 0.10;
+  static const double _leaf3LeftFactor = 0.109;
+  static const double _leaf3TopFactor = 0.778;
 
   @override
   State<OnboardingWidget> createState() => _OnboardingWidgetState();
@@ -46,10 +47,9 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
 
   Future<void> _precacheBackground() async {
     try {
-      await precacheImage(
-        const AssetImage(OnboardingWidget._backgroundAsset),
-        context,
-      );
+      await SvgAssetLoader(
+        OnboardingWidget._backgroundAsset,
+      ).loadBytes(context);
       if (!mounted) {
         return;
       }
@@ -58,8 +58,14 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
         SvgAssetLoader(HijabGirlWidget.armAsset).loadBytes(context),
         SvgAssetLoader(HijabGirlWidget.frontAsset).loadBytes(context),
         SvgAssetLoader('assets/icons/hand_handphone.svg').loadBytes(context),
-        SvgAssetLoader('assets/icons/leaf3.svg').loadBytes(context),
+        SvgAssetLoader(PotLeafWidget.baseAsset).loadBytes(context),
+        SvgAssetLoader(PotLeafWidget.leafAsset).loadBytes(context),
+        SvgAssetLoader('assets/icons/blok square.svg').loadBytes(context),
         SvgAssetLoader('assets/icons/sparkle.svg').loadBytes(context),
+        precacheImage(
+          const AssetImage('assets/icons/handphone_runtime.png'),
+          context,
+        ),
       ]);
     } catch (_) {
       // Keep the widget usable even if preload fails.
@@ -103,7 +109,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
           Positioned.fill(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
+              child: SvgPicture.asset(
                 OnboardingWidget._backgroundAsset,
                 fit: BoxFit.cover,
                 alignment: OnboardingWidget._backgroundAlignment,
@@ -113,14 +119,13 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
           Positioned.fill(
             child: Sparkle4Widget(width: width, height: height),
           ),
+          Positioned.fill(
+            child: FloatingFourWidget(width: width, height: height),
+          ),
           Positioned(
             left: width * OnboardingWidget._handphone2LeftFactor,
             top: height * OnboardingWidget._handphone2TopFactor,
-            child: Transform.rotate(
-              angle: 0.19,
-              alignment: Alignment.center,
-              child: Handphone2Widget(width: handphone2Width),
-            ),
+            child: Handphone2Widget(width: handphone2Width),
           ),
           Positioned(
             left: width * OnboardingWidget._hijabGirlLeftFactor,
@@ -130,7 +135,7 @@ class _OnboardingWidgetState extends State<OnboardingWidget> {
           Positioned(
             left: width * OnboardingWidget._leaf3LeftFactor,
             top: height * OnboardingWidget._leaf3TopFactor,
-            child: Leaf3Widget(width: leaf3Width, height: leaf3Height),
+            child: PotLeafWidget(width: leaf3Width, height: leaf3Height),
           ),
         ],
       ),
